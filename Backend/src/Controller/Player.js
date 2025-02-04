@@ -1,21 +1,23 @@
-function ChessplayerLogic(socket, io, chess, players, currPlayer){
-    if(!players.white){
+import { Chess } from 'chess.js';
+
+function ChessplayerLogic(socket, io, chess, players, currPlayer) {
+    if (!players.white) {
         players.white = socket.id;
-        socket.emit("playerRole" , 'w');
+        socket.emit("playerRole", 'w');
     }
-    else if(!players.black){
+    else if (!players.black) {
         players.black = socket.id;
         socket.emit("playerRole", 'b');
     }
-    else{
+    else {
         socket.emit("SpectatorRole");
     }
 
-    socket.on('disconnect' , () => {
-        if(socket.id == players.white){
+    socket.on('disconnect', () => {
+        if (socket.id === players.white) {
             delete players.white;
         }
-        else if (socket.id == players.black){
+        else if (socket.id === players.black) {
             delete players.black;
         }
     });
@@ -23,25 +25,25 @@ function ChessplayerLogic(socket, io, chess, players, currPlayer){
     move(socket, io, chess, players, currPlayer);
 }
 
-function move(socket, io, chess, players, currPlayer){
-    socket.on('move' , (move) => {
+function move(socket, io, chess, players, currPlayer) {
+    socket.on('move', (move) => {
         try {
-            if(chess.turn() == 'w' && socket.id != players.white) return;
-            if(chess.turn() == 'b' && socket.id != players.black) return;
+            if (chess.turn() === 'w' && socket.id !== players.white) return;
+            if (chess.turn() === 'b' && socket.id !== players.black) return;
 
             const res = chess.move(move);
-            if(res){
+            if (res) {
                 currPlayer = chess.turn();
-                io.emit("move" , move);
-                io.emit("boardState" , chess.fen());
+                io.emit("move", move); // Emit move to all clients
+                io.emit("boardState", chess.fen()); // Emit the new board state to all clients
             }
-            else{
+            else {
                 console.log("Wrong move");
             }
         } catch (error) {
             console.log(error);
         }
-    })
+    });
 }
 
 export default ChessplayerLogic;
