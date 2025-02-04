@@ -2,10 +2,15 @@ import express from 'express';
 import cors from 'cors';
 import { Server } from 'socket.io';
 import { createServer } from 'node:http';
+import { Chess } from 'chess.js';
+import ChessplayerLogic from './Controller/Player.js';
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
+const chess = new Chess();
+let players = {};
+let currPlayer = 'w';
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -19,7 +24,7 @@ app.get('/ping' , (req , res) => {
 });
 
 io.on('connection', (socket) => {
-    console.log('a user connected');
+    ChessplayerLogic(socket , io , chess , players , currPlayer);
 });
 
 
