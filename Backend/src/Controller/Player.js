@@ -20,7 +20,7 @@ function ChessplayerLogic(socket, io, chess, players, currPlayer){
         }
     });
 
-    move();
+    move(socket, io, chess, players, currPlayer);
 }
 
 function move(socket, io, chess, players, currPlayer){
